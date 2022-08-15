@@ -20,14 +20,15 @@ const mutations = {
 }
 // 执行异步
 const actions = {
-  async login(content, data) {
+  async login(context, data) {
     // 调用api接口
     const result = await login(data)
-    if (result.data.success) {
+    if (result) {
+      console.log(result)
       // 表示登录接口调用成功 也就是意味着你的用户名和密码是正确的
       // 现在有用户token
       // actions 修改state 必须通过mutations
-      content.commit('setToken', result.data.data)
+      context.commit('setToken', result)
     }
   }
 }

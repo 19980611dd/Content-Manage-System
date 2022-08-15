@@ -67,7 +67,7 @@
 </template>
 <script>
 import { validMobile } from '@/utils/validate'
-
+import { mapActions } from 'vuex' // 引入vuex的辅助函数
 export default {
   name: 'Login',
   data() {
@@ -115,6 +115,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['user/login']),
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -126,28 +127,26 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
-        if (valid) {
+      this.$refs.loginForm.validate(async (isOK) => {
+        try {
           this.loading = true
-          this.$store
-            .dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
-        } else {
-          console.log('error submit!!')
-          return false
+          if (isOK) {
+            await this['user/login'](this.loginForm)
+            // async标记的函数实际上一个promise对象
+            // await下面的代码 都是成功执行的代码
+            this.$router.push('/')
+          }
+        } catch (error) {
+          console.log(error)
+        } finally {
+          //  不论执行try 还是catch  都去关闭转圈
+          this.loading = false
         }
       })
     }
   }
 }
 </script>
-
 <style lang="scss">
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
@@ -204,7 +203,6 @@ $cursor: #fff;
   }
 }
 </style>
-
 <style lang="scss" scoped>
 $bg: #2d3a4b;
 $dark_gray: #889aa4;
