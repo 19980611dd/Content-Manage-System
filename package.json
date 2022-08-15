@@ -19,7 +19,7 @@
     "element-ui": "^2.15.9",
     "js-cookie": "^3.0.1",
     "normalize.css": "7.0.0",
-    "nprogress": "0.2.0",
+    "nprogress": "^0.2.0",
     "path-to-regexp": "2.4.0",
     "vue": "2.6.10",
     "vue-router": "3.0.6",
