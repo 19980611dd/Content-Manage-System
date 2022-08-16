@@ -4,13 +4,16 @@ import store from '@/store'
 import NProgress from 'nprogress' // 引入一份进度条插件
 import 'nprogress/nprogress.css' // 引入进度条样式
 const whiteList = ['/login', '/404'] // 定义白名单  所有不受权限控制的页面
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   NProgress.start() // 开启进度条
   if (store.getters.token) {
     if (to.path === '/login') {
       next('/')
     } else {
       next()
+      if (!store.getters.userId) {
+        await store.dispatch('user/getUserInfo')
+      }
     }
   } else {
     if (whiteList.includes(to.path)) {

@@ -1,9 +1,10 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { login } from '@/api/user' // 引入登录接口
+import { login, getUserInfo } from '@/api/user' // 引入登录接口
 // 状态
 const state = {
   // 设置token为共享状态
-  token: getToken() //设置token为共享状态  初始化的时候，先从缓存里面读取
+  token: getToken(), //设置token为共享状态  初始化的时候，先从缓存里面读取
+  userInfo: {}
 }
 // 修改状态
 const mutations = {
@@ -16,6 +17,13 @@ const mutations = {
   removeToken(state) {
     state.token = null //将vuex的数据置空
     removeToken()
+  },
+  setUserInfo(state, userInfo) {
+    state.userInfo = userInfo
+  },
+  // 删除用户信息
+  removeUserInfo(state) {
+    state.userInfo = {}
   }
 }
 // 执行异步
@@ -30,6 +38,12 @@ const actions = {
       // actions 修改state 必须通过mutations
       context.commit('setToken', result)
     }
+  },
+  async getUserInfo(context) {
+    const result = await getUserInfo()
+    console.log(result)
+    context.commit('setUserInfo', result)
+    // return result // 这里为什么要返回 为后面埋下伏笔
   }
 }
 export default {
