@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { login, getUserInfo } from '@/api/user' // 引入登录接口
+import { login, getUserInfo, getUserDetailById } from '@/api/user' // 引入登录接口
 // 状态
 const state = {
   // 设置token为共享状态
@@ -41,9 +41,16 @@ const actions = {
   },
   async getUserInfo(context) {
     const result = await getUserInfo()
+    // 获取用户头像信息
+    const baseInfo = await getUserDetailById(result.userId)
     console.log(result)
-    context.commit('setUserInfo', result)
-    // return result // 这里为什么要返回 为后面埋下伏笔
+    context.commit('setUserInfo', { ...result, ...baseInfo })
+    return result // 这里为什么要返回 为后面埋下伏笔
+  },
+  //登出功能 删除用户信息
+  logout(context) {
+    context.commit('removeToken')
+    context.commit('removeUserInfo')
   }
 }
 export default {
