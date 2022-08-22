@@ -1,7 +1,10 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store' // 导入store
+import { getTimeStamp } from './auth'
+import router from '@/router'
 // 创建一个axios的实例
+const timeOut = 7200
 const service = axios.create({
   // 如果执行 npm run dev  值为 /api 正确  /api 这个代理只是给开发环境配置的代理
   // 如果执行 npm run build 值为 /prod-api  没关系  运维应该在上线的时候 给你配置上 /prod-api的代理
@@ -13,6 +16,11 @@ service.interceptors.request.use(
   (config) => {
     // 在这个位置需要统一的去注入token
     if (store.getters.token) {
+      if (isCheckTime()) {
+        store.dispatch('user/logout')
+        router.push('/login')
+        return Promise.reject(new Error('token超时了'))
+      }
       // 如果token存在 注入token
       config.headers['Authorization'] = `Bearer ${store.getters.token}`
     }
@@ -37,8 +45,22 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    Message.error(error.message) // 提示错误信息
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.code === 10002
+    ) {
+      store.dispatch('user/logout')
+      router.push('/login')
+    } else {
+      Message.error(error.message) // 提示错误信息
+    }
     return Promise.reject(error) // 返回执行错误 让当前的执行链跳出成功 直接进入 catch
   }
 )
+function isCheckTime() {
+  var currentTime = Date.now()
+  var timeStamp = getTimeStamp()
+  return (currentTime - timeStamp) / 1000 > timeOut
+}
 export default service

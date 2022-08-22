@@ -1,4 +1,4 @@
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 import { login, getUserInfo, getUserDetailById } from '@/api/user' // 引入登录接口
 // 状态
 const state = {
@@ -31,6 +31,8 @@ const actions = {
   async login(context, data) {
     // 调用api接口
     const result = await login(data)
+    // 设置时间戳
+    setTimeStamp()
     if (result) {
       console.log(result)
       // 表示登录接口调用成功 也就是意味着你的用户名和密码是正确的
